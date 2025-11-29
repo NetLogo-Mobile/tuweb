@@ -76,7 +76,6 @@ if (!empty($contentId) && !empty($category)) {
 }
 
 $content = $contentData['Data'] ?? null;
-
 // 处理日期格式
 function formatDate($timestamp) {
     return date('Y年m月d日', $timestamp / 1000);
@@ -130,7 +129,7 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
                     }
                 ?>');">
                     <div style="text-align: left;">
-                        <div class="title"><?= htmlspecialchars($content['LocalizedSubject']['Chinese'] ?? '未知标题') ?></div>
+                        <div class="title"><?= htmlspecialchars($content['LocalizedSubject']['Chinese'] ?? $content['Subject']) ?></div>
                         <div style="position: absolute; z-index: 100;">
                             <div class="tag" style="color: aquamarine; font-weight: bold;">
                                 <?= htmlspecialchars($content['Category'] === 'Model' ? 'Model' : 'Experiment') ?>
@@ -212,7 +211,7 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
                                                 <?php if ($content && isset($content['LocalizedDescription']['Chinese'])): ?>
                                                     <?= nl2br(htmlspecialchars($content['LocalizedDescription']['Chinese'])) ?>
                                                 <?php else: ?>
-                                                    <p>暂无作品介绍</p>
+                                                    <?= implode('<br>', $content['Description']) ?>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
