@@ -1,9 +1,9 @@
 <?php
 session_start();
-
+$r = urldecode($_GET['r']) ?? '';
 // 如果已登录，重定向到首页
-if (isset($_SESSION['username']) && !empty($_SESSION['username'])) {
-    header('Location: /');
+if (isset($_SESSION['responseBody']) && !empty($_SESSION['responseBody'])) {
+    header('Location: /' . $r);
     exit;
 }
 
@@ -116,22 +116,18 @@ class AuthService {
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $authService = new AuthService();
         $loginData = $authService->login();
-        
-        // 登录成功，保存到session
-        $_SESSION['username'] = $loginData['Data']['User']['Nickname'] ?? '匿名用户';
         $_SESSION['token'] = $authService->token;
         $_SESSION['authCode'] = $authService->authCode;
         $_SESSION['responseBody'] = $authService->responseBody;
         
         // 重定向到首页
-        header('Location: /');
+        header('Location: /' . $r);
         exit;
     } catch (Exception $e) {
         $errorMsg = $e->getMessage();
+        echo $errorMsg;
     }
-}
 ?>
