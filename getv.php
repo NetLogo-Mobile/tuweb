@@ -13,18 +13,13 @@ class AuthService {
     public $authCode;
     public $responseBody; // 新增：存储API响应主体
 
-    public function __construct($username, $password) {
-        $this->username = $username;
-        $this->password = $password;
-    }
-
     public function login() {
         $identifier = bin2hex(random_bytes(20));
         $identifier = str_pad($identifier, 40, '0', STR_PAD_LEFT);
 
         $requestData = [
-            'Login' => $this->username,
-            'Password' => $this->password,
+            'Login' => '',
+            'Password' => '',
             'Version' => 2411,
             'Device' => [
                 'Identifier' => $identifier,
