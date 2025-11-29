@@ -10,6 +10,10 @@ $type = $_GET['type'] ?? '';
 $dt = null;
 if (isset($_SESSION['responseBody'])) {
     $dt = is_string($_SESSION['responseBody']) ? json_decode($_SESSION['responseBody'], true) : $_SESSION['responseBody'];
+} else {
+  $redirectUrl = '/getv.php?r=' . urlencode('med.php?category=' . $category . '&id=' . $contentId . '&type=' . $type);
+  header('Location: ' . $redirectUrl);
+  exit;
 }
 
 // 获取作品详情的函数
@@ -66,7 +70,7 @@ if (!empty($contentId) && !empty($category)) {
     $token = $_SESSION['token'] ?? '';
     $authCode = $_SESSION['authCode'] ?? '';
     
-    if (!empty($token) && !empty($authCode)) {
+    if (isset($token) && isset($authCode)) {
         $contentData = getContentSummary($contentId, $category, $token, $authCode);
     }
 }
