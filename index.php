@@ -7,7 +7,10 @@ if (isset($_SESSION['responseBody'])) {
 
 // 检查登录状态
 $isLoggedIn = isset($dt['Data']['User']['Nickname']) && $dt['Data']['User']['Nickname'] !== '点击登录';
-
+if(!$isLoggedIn){ 
+    header('Location: getv.php');
+    exit;
+}
 // 获取API数据
 function getCommunityData() {
     $apiUrl = 'https://nlm-api-cn.turtlesim.com/Users';
