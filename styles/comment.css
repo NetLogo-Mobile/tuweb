@@ -1,0 +1,63 @@
+dialog {
+   position: fixed;
+   top: 0%;
+   left: 0%;
+   height: 100%;
+   width: 100%;
+   border: none;
+   z-index: 100;
+   overflow: hidden;
+}
+
+#dt {
+   position: absolute;
+   top: 10%;
+   left: 0%;
+   height: 90%;
+   width: 100%;
+   border: none;
+   font-size: 3vh;
+}
+
+#dh {
+   position: absolute;
+   top: 0%;
+   left: 0%;
+   height: 10%;
+   width: 100%;
+   background-color: #eee;
+ }
+
+.red {
+   background-color: #e00;
+   position: absolute;
+   top: 20%;
+   left: 88%;
+   height: 60%;
+   width: 10%;
+   color: white;
+   font-size: 2.5vh;
+   border-radius: 10px;
+}
+
+.mid {
+   position: absolute;
+   top: -10%;
+   left: 8%;
+}
+
+#start {
+  height: 30px;
+  width: 50%;
+  border: 1px solid #111;
+  border-radius: none;
+  text-align: left;
+  color: gray;
+  background-color: #eee;
+}
+
+textarea:focus {
+    border-color: rgba(0,0,0,0);
+    outline: none;
+    box-shadow: 0 0 0.1px rgba(255,255,255,0);
+}
