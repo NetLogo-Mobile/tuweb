@@ -1,6 +1,6 @@
 <?php
 session_start();
-$username = "匿名用户";
+$username = "";
 $token = "";
 $authCode = "";
 $responseBody = ""; // 新增：用于存储响应主体
@@ -110,13 +110,8 @@ class AuthService {
     }
 }
 
-try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-        
-        if (!empty($username) && !empty($password)) {
-            $authService = new AuthService($username, $password);
+            $authService = new AuthService('', '');
             $loginData = $authService->login();
             
             // 登录成功，保存到session
@@ -128,11 +123,5 @@ try {
             // 重定向或显示成功消息
             header('Location: /');
             exit;
-        } else {
-            $error = "用户名和密码不能为空";
-        }
     }
-} catch (Exception $e) {
-    
-}
 ?>
