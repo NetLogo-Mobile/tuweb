@@ -1,17 +1,23 @@
 <?php
 session_start();
+
+// 如果已登录，重定向到首页
+if (isset($_SESSION['username']) && !empty($_SESSION['username'])) {
+    header('Location: /');
+    exit;
+}
+
 $username = "";
 $token = "";
 $authCode = "";
-$responseBody = ""; // 新增：用于存储响应主体
+$responseBody = "";
+$errorMsg = ""; // 新增：用于存储错误信息
 
 class AuthService {
     private $baseUrl = 'http://nlm-api-cn.turtlesim.com/';
-    private $username;
-    private $password;
     public $token;
     public $authCode;
-    public $responseBody; // 新增：存储API响应主体
+    public $responseBody;
 
     public function login() {
         $identifier = bin2hex(random_bytes(20));
@@ -36,7 +42,7 @@ class AuthService {
 
         $response = $this->postRequest("Users/Authenticate", $requestData, $headers);
         $statusCode = $response['status'];
-        $this->responseBody = $response['body']; // 存储原始响应主体
+        $this->responseBody = $response['body'];
         
         $responseData = json_decode($this->responseBody, true);
         
@@ -110,18 +116,22 @@ class AuthService {
     }
 }
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $authService = new AuthService('', '');
-            $loginData = $authService->login();
-            
-            // 登录成功，保存到session
-            $_SESSION['username'] = $username;
-            $_SESSION['token'] = $authService->token;
-            $_SESSION['authCode'] = $authService->authCode;
-            $_SESSION['responseBody'] = $authService->responseBody; // 存储响应主体到session
-            
-            // 重定向或显示成功消息
-            header('Location: /');
-            exit;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $authService = new AuthService();
+        $loginData = $authService->login();
+        
+        // 登录成功，保存到session
+        $_SESSION['username'] = $loginData['Data']['User']['Nickname'] ?? '匿名用户';
+        $_SESSION['token'] = $authService->token;
+        $_SESSION['authCode'] = $authService->authCode;
+        $_SESSION['responseBody'] = $authService->responseBody;
+        
+        // 重定向到首页
+        header('Location: /');
+        exit;
+    } catch (Exception $e) {
+        $errorMsg = $e->getMessage();
     }
+}
 ?>
