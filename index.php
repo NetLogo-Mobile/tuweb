@@ -3,6 +3,16 @@ session_start();
 $dt = null;
 if (isset($_SESSION['responseBody'])) {
     $dt = is_string($_SESSION['responseBody']) ? json_decode($_SESSION['responseBody'], true) : $_SESSION['responseBody'];
+} else {
+    $redirectUrl = '/getv.php';
+    if (!headers_sent()) {
+        header('Location: ' . $redirectUrl);
+        exit;
+    } else {
+        // 如果已经有输出，使用JavaScript重定向作为备用
+        echo '<script>window.location.href = "' . $redirectUrl . '";</script>';
+        exit;
+    }
 }
 
 // 检查登录状态
