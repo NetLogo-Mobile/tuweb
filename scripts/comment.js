@@ -1,4 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
     const dialog = document.querySelector('dialog');
     const originalText = dialog.innerHTML.trim(); // 获取原始文本 "编辑评论内容"
     
@@ -19,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const header = document.createElement('div');
     header.id='dh';
-    header.innerHTML='<img src="return.png" height="80%" onclick="document.querySelector(\'dialog\').close();"/><h2 class="mid">'+inputPlaceholder+'</h2>';
+    header.innerHTML='<img src="../imgs/return.png" height="80%" onclick="document.querySelector(\'dialog\').close();"/><h2 class="mid">'+inputPlaceholder+'</h2>';
     dialog.appendChild(header);
 
     // 创建提交按钮
@@ -49,19 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 创建触发按钮并添加到页面
-    const trigger = document.createElement('button');
-    trigger.textContent = originalText;
-    trigger.id='start';
-    trigger.style.margin = '10px'; // 添加间距
-    document.body.insertBefore(trigger, dialog); // 插入到dialog前面
-
     // 点击触发按钮打开对话框
-    trigger.addEventListener('click', () => {
+    document.getElementById('start').addEventListener('click', () => {
         dialog.showModal();
         input.focus(); // 自动聚焦输入框
     });
-});
 
 /* 示例sm函数 */
 function sm(value) {
