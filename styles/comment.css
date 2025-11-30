@@ -1,33 +1,3 @@
-dialog {
-   position: fixed;
-   top: 0%;
-   left: 0%;
-   height: 100%;
-   width: 100%;
-   border: none;
-   z-index: 100;
-   overflow: hidden;
-}
-
-#dt {
-   position: absolute;
-   top: 10%;
-   left: 0%;
-   height: 90%;
-   width: 100%;
-   border: none;
-   font-size: 3vh;
-}
-
-#dh {
-   position: absolute;
-   top: 0%;
-   left: 0%;
-   height: 10%;
-   width: 100%;
-   background-color: #eee;
- }
-
 .red {
    background-color: #e00;
    position: absolute;
@@ -40,24 +10,157 @@ dialog {
    border-radius: 10px;
 }
 
-.mid {
-   position: absolute;
-   top: -10%;
-   left: 8%;
-}
-
-#start {
-  height: 30px;
-  width: 50%;
-  border: 1px solid #111;
-  border-radius: none;
-  text-align: left;
-  color: gray;
-  background-color: #eee;
-}
-
 textarea:focus {
     border-color: rgba(0,0,0,0);
     outline: none;
     box-shadow: 0 0 0.1px rgba(255,255,255,0);
+}
+
+/* 评论框样式修复 */
+dialog {
+    position: fixed;
+    top: 5%;
+    left: 5%;
+    z-index: 80;
+    height: 90%;
+    width: 90%;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    background: white;
+    overflow: hidden;
+}
+
+#dt {
+    position: absolute;
+    top: 10%;
+    left: 0%;
+    height: 90%;
+    width: 100%;
+    border: none;
+    font-size: 16px;
+    padding: 20px;
+    resize: none;
+    font-family: inherit;
+    line-height: 1.5;
+    background: #fafafa;
+}
+
+#dh {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    height: 10%;
+    width: 100%;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid #e9ecef;
+ }
+
+#dh img {
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+#dh img:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.mid {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.red {
+    background-color: red;
+    position: static;
+    height: auto;
+    width: auto;
+    color: white;
+    font-size: 14px;
+    border-radius: 10px;
+    border: none;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 0;
+}
+
+.red:hover {
+    background-color: #1060c0;
+}
+
+/* 移除原有的绝对定位样式 */
+.red,
+.mid {
+    position: static;
+    top: auto;
+    left: auto;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    dialog {
+        top: 2%;
+        left: 2%;
+        height: 96%;
+        width: 96%;
+    }
+    
+    #dt {
+        font-size: 14px;
+        padding: 15px;
+    }
+    
+    .mid {
+        font-size: 16px;
+    }
+    
+    .red {
+        padding: 6px 16px;
+        font-size: 13px;
+    }
+    
+    #dh {
+        padding: 0 15px;
+    }
+}
+
+/* 对话框背景遮罩 */
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+/* #start 按钮位置和尺寸修复 */
+#start {
+    position: fixed;
+    bottom: 0px;
+    right: 0%;
+    transform: translateY(-10%);
+    height: 40px;
+    width: 48%;
+    z-index: 70;
+    border: 1px solid #111;
+    border-radius: none;
+    text-align: left;
+    color: gray;
+    background-color: #f6f6f6;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    #start {
+        bottom: 0px;
+        width: 98%;
+        max-width: 700px;
+        height: 45px;
+    }
 }
