@@ -56,6 +56,17 @@
 
 /* 示例sm函数 */
 function sm(value) {
-    //向服务器通信
+    var rid = document.getElementById('start').dataset.rid;
+    fetch('/comment/send.php?'+location.href.split('?')[1]+'&con='+value+'&rid='+rid)
+    .then(() => {
+        fetch('/comment/?'+location.href.split('?')[1])
+    .then(response => response.text())
+    .then(html => {
+        document.getElementById('comments').innerHTML = html;
+    })
+    .catch(error => {
+        document.getElementById('comments').innerHTML = '<div class="error">加载评论失败</div>';
+    });
+    });
     document.querySelector('dialog').close();
 }
