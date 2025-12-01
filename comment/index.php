@@ -184,8 +184,8 @@ function formatCommentTime($timestamp) {
 // 处理回复内容中的@用户标签
 function processReplyContent($content) {
     // 匹配 <user=用户ID>@用户名 格式
-    $pattern = '/<user=([a-f0-9]+)>@([^<]+)/';
-    $replacement = '<span class="RUser" data-user="$1">@$2</span>';
+    $pattern = '/<user=([a-f0-9]+)>([^<]+)<\/user>/';
+    $replacement = '<span class="RUser" data-user="$1">$2</span>';
     
     return preg_replace($pattern, $replacement, $content);
 }
@@ -202,13 +202,13 @@ function processReplyContent($content) {
             background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
-        }*/
+        }
         
         .scroll-container {
             max-width: 80vh;
             margin: 0 auto;
-            /*padding: 16px;*/
-        }
+            padding: 16px;
+        }*/
         
         #notification_container {
             display: flex;
@@ -324,7 +324,7 @@ function processReplyContent($content) {
         <?php else: ?>
             <?php foreach ($comments as $index => $comment): ?>
                 <div>
-                    <div id="notification_container">
+                    <div id="notification_container" data-rid="<?= $comment['UserID'] ?? '' ?>">
                         <div class="img">
                             <img id="avatar" 
                                  src="<?= getAvatarUrl($comment['UserID'] ?? '', $comment['Avatar'] ?? 0) ?>" 
@@ -338,7 +338,7 @@ function processReplyContent($content) {
                             </div>
                             <div id="notification_message" class="notification_message">
                                 <div id="notification_text" class="notification_text">
-                                    <?= processReplyContent(nl2br(htmlspecialchars($comment['Content'] ?? ''))) ?>
+                                    <?= processReplyContent($comment['Content'] ?? '') ?>
                                 </div>
                             </div>
                         </div>
@@ -355,34 +355,3 @@ function processReplyContent($content) {
             <div class="observer-element" style="margin-top: 0px;"></div>
         <?php endif; ?>
     </div>
-
-    <script>
-        // 添加点击用户名的交互功能
-        document.addEventListener('DOMContentLoaded', function() {
-            // 点击用户头像或名称时跳转到用户页面
-            const userElements = document.querySelectorAll('#notification_container');
-            userElements.forEach(container => {
-                const avatar = container.querySelector('#avatar');
-                const name = container.querySelector('.name');
-                
-                const onClick = function() {
-                    // 这里可以添加跳转到用户页面的逻辑
-                    console.log('点击用户:', this.textContent || this.alt);
-                };
-                
-                if (avatar) avatar.addEventListener('click', onClick);
-                if (name) name.addEventListener('click', onClick);
-            });
-            
-            // 点击@用户时跳转到对应用户页面
-            const rUsers = document.querySelectorAll('.RUser');
-            rUsers.forEach(rUser => {
-                rUser.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-user');
-                    const userName = this.textContent;
-                    console.log('点击@用户:', userName, 'ID:', userId);
-                    // 这里可以添加跳转到对应用户页面的逻辑
-                });
-            });
-        });
-    </script>
