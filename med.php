@@ -102,6 +102,7 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
     <meta name="referrer" content="no-referrer">
     <meta name="google" content="notranslate">
     <title><?= htmlspecialchars($content['LocalizedSubject']['Chinese'] ?? $pageTitle) ?> - Turtle Universe Web</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel='stylesheet' href='../styles/comment.css'/>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}body{font-family:v-sans,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";font-size:14px;line-height:1.6;margin:0;background:#f5f7fa;color:#333}.RUser{color:cornflowerblue}a[internal]{color:cornflowerblue;text-decoration:none}.basic-layout{display:flex;height:100vh}.layout-left{flex:1;position:relative}.layout-right{flex:1;overflow:hidden}.cover{height:100%;background-size:cover;background-position:center;position:relative;display:flex;flex-direction:column;padding:20px}.return{width:2.7em;cursor:pointer}.title{font-size:24px;font-weight:bold;color:white;margin:10px 0;text-align:left}.tag{display:inline-block;padding:4px 12px;margin:2px;border-radius:16px;background:rgba(255,255,255,0.2);color:white;font-size:12px}.coverBottom{margin-top:auto}.btns{display:flex;justify-content:space-around}.enter{padding:8px 24px;border-radius:25px;background:#2080f0;color:white;border:none;cursor:pointer;font-size:14px}.scroll-container{height:100%;overflow-y:auto}.context{padding:20px}.n-tabs{width:100%}.n-tabs-wrapper{display:flex;justify-content:space-evenly}.n-tabs-tab{padding:10px 0;cursor:pointer;color:#666}.n-tabs-tab--active{color:#18a058;font-weight:500}.n-tab-pane{margin-top:20px}.gray{background:#f8f9fa;border-radius:12px;padding:15px}.intro{text-align:left;line-height:1.8}.intro p{margin-bottom:15px}.intro h1,.intro h2,.intro h3{color:#2080f0;margin:20px 0 10px}.intro ul,.intro ol{margin:10px 0;padding-left:20px}.intro li{margin:5px 0}.user-info{display:flex;align-items:center;padding:15px;background:white;border-radius:10px;margin:5px 0}.user-avatar{width:50px;height:50px;border-radius:50%;margin-right:15px}.user-details{text-align:left}.user-name{color:#007bff;margin:0;font-size:16px}.user-bio{color:gray;margin:5px 0 0}.action-buttons{display:flex;gap:10px;margin:20px 0}.btn{padding:10px 20px;border-radius:20px;border:none;cursor:pointer;font-size:14px}.btn-primary{background:#2080f0;color:white}.btn-secondary{background:#f8f9fa;color:#333;border:1px solid #ddd}.error{text-align:center;padding:60px 20px;color:#e74c3c}.empty{text-align:center;padding:60px 20px;color:#666}.back-button{position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.2);color:white;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;z-index:10}.footer{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:10px 0;box-shadow:0 -2px 10px rgba(0,0,0,0.1);z-index:1000}.footer div{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;color:#666}.footer div.active{color:#667eea}.footer i{font-size:20px}.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:15px 0}.stat-item{text-align:center;padding:10px;background:white;border-radius:8px}.stat-number{font-size:18px;font-weight:bold;color:#2080f0}.stat-label{font-size:12px;color:#666}.markdown-content h1{font-size:24px;margin:20px 0 10px}.markdown-content h2{font-size:20px;margin:15px 0 8px}.markdown-content h3{font-size:16px;margin:12px 0 6px}.markdown-content ul,.markdown-content ol{padding-left:20px}.markdown-content li{margin:5px 0}@media (max-width:768px){.basic-layout{flex-direction:column}.layout-left,.layout-right{flex:none}.layout-left{height:50vh}.layout-right{height:50vh}.stats-grid{grid-template-columns:repeat(2,1fr)}}
@@ -133,7 +134,7 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
                         <div style="position: absolute; z-index: 100;">
                             <div class="tag" style="color: aquamarine; font-weight: bold;">
                                 <?= htmlspecialchars($content['Category'] === 'Model' ? 'Model' : 'Experiment') ?>
-                            </div>
+                            </div><div class="tag"><i class="fas fa-eye"></i>&nbsp;<?= $content['Visits'] ?? 0 ?></div>
                             <?php if ($content && isset($content['Tags'])): ?>
                                 <?php foreach (array_slice($content['Tags'], 0, 5) as $tag): ?>
                                     <div class="tag"><?= htmlspecialchars($tag) ?></div>
@@ -270,5 +271,39 @@ fetch('/comment/?category=<?= $category ?>&id=<?= $contentId ?>')
         document.getElementById('comments').innerHTML = '<div class="error">加载评论失败</div>';
     });
   </script>
+    <script>
+    setInterval(()=>{
+            // 点击用户头像或名称时跳转到用户页面
+            const userElements = document.querySelectorAll('#notification_container');
+            userElements.forEach(container => {
+                const avatar = container.querySelector('#avatar');
+                const name = container.querySelector('.name');
+                container.addEventListener('click', function(){
+                  document.body.querySelector('textarea').value='回复@'+name.innerHTML+': ';
+                  const bt=document.getElementById('start');
+                  bt.innerText=' 回复@'+name.innerText+'：';
+                  bt.style.color='black';
+                  bt.dataset.rid=container.dataset.rid;
+                });
+                const onClick = function() {
+                  /*this.textContent || this.alt*/
+                };
+                
+                if (avatar) avatar.addEventListener('click', onClick);
+                if (name) name.addEventListener('click', onClick);
+            });
+            
+            // 点击@用户时跳转到对应用户页面
+            const rUsers = document.querySelectorAll('.RUser');
+            rUsers.forEach(rUser => {
+                rUser.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user');
+                    const userName = this.textContent;
+                    console.log('点击@用户:', userName, 'ID:', userId);
+                    // 这里可以添加跳转到对应用户页面的逻辑
+                });
+            });
+     }, 500);
+    </script>
 </body>
 </html>
