@@ -92,7 +92,7 @@ $modules = [
                                     $author = $exp['User']['Nickname'] ?? '未知作者';
                                     $date = formatDate($exp['ID'] ?? '');
                                     $tags = $exp['Tags'] ?? [];
-                                    $imgSrc = 'http://netlogo-static-cn.turtlesim.com/experiments/images/' . 
+                                    $imgSrc = 'http://netlogo-cn.oss-cn-hongkong.aliyuncs.com/experiments/images/' . 
                                              substr($exp['ID'] ?? '0000000000000000', 0, 4) . '/' .
                                              substr($exp['ID'] ?? '0000000000000000', 4, 2) . '/' .
                                              substr($exp['ID'] ?? '0000000000000000', 6, 2) . '/' .
@@ -133,8 +133,8 @@ $modules = [
     <div class="footer">
         <div class="active"><i class="fas fa-home"></i><span>首页</span></div>
         <div><i class="fas fa-user"></i><span>我的</span></div>
-        <div><i class="fas fa-water"></i><span>海水</span></div>
-        <div><i class="fas fa-cube"></i><span>模型库</span></div>
+        <div onclick="location.href='discussion.php'"><i class="fas fa-water"></i><span>海水</span></div>
+        <div onclick="location.href='model.php'"><i class="fas fa-cube"></i><span>模型库</span></div>
         <div><i class="fas fa-bell"></i><span>通知</span></div>
     </div>
 
