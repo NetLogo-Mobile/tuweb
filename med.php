@@ -133,7 +133,7 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
                         <div class="title"><?= htmlspecialchars($content['LocalizedSubject']['Chinese'] ?? $content['Subject']) ?></div>
                         <div style="position: absolute; z-index: 100;">
                             <div class="tag" style="color: aquamarine; font-weight: bold;">
-                                <?= htmlspecialchars($content['Category'] === 'Model' ? 'Model' : 'Experiment') ?>
+                                <?= htmlspecialchars($content['Category']) ?>
                             </div><div class="tag"><i class="fas fa-eye"></i>&nbsp;<?= $content['Visits'] ?? 0 ?></div>
                             <?php if ($content && isset($content['Tags'])): ?>
                                 <?php foreach (array_slice($content['Tags'], 0, 5) as $tag): ?>
