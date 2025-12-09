@@ -119,7 +119,7 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
                 
                 <div class="cover" style="background-image: url('<?php 
                     if ($content && isset($content['Image'])) {
-                        echo 'http://netlogo-static-cn.turtlesim.com/experiments/images/' . 
+                        echo 'http://netlogo-cn.oss-cn-hongkong.aliyuncs.com/experiments/images/' . 
                              substr($content['ID'], 0, 4) . '/' .
                              substr($content['ID'], 4, 2) . '/' .
                              substr($content['ID'], 6, 2) . '/' .
@@ -167,10 +167,10 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
                                     <!-- 简介标签页 -->
                                     <div id="intro-tab" class="qh">
 <!-- 用户信息卡片 -->
-                        <div class="user-info">
+                        <div class="user-info" onclick="getUserCard('<?= $content['User']['ID'] ?>')">
                             <img class="user-avatar" src="<?php
                                 if ($content && isset($content['User']['Avatar'])) {
-                                    echo 'http://netlogo-static-cn.turtlesim.com/users/avatars/' . 
+                                    echo 'http://netlogo-cn.oss-cn-hongkong.aliyuncs.com/users/avatars/' . 
                                          substr($content['User']['ID'], 0, 4) . '/' .
                                          substr($content['User']['ID'], 4, 2) . '/' .
                                          substr($content['User']['ID'], 6, 2) . '/' .
@@ -211,7 +211,6 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
             </div>
         </div>
     </div>
-
     <script>
         // 标签页切换
         function switchTab(tabName) {
@@ -286,7 +285,8 @@ fetch('/comment/?category=<?= $category ?>&id=<?= $contentId ?>')
                   bt.dataset.rid=container.dataset.rid;
                 });
                 const onClick = function() {
-                  /*this.textContent || this.alt*/
+                  const userId = container.getAttribute('data-rid');
+                  getUserCard(userId);
                 };
                 
                 if (avatar) avatar.addEventListener('click', onClick);
@@ -298,12 +298,340 @@ fetch('/comment/?category=<?= $category ?>&id=<?= $contentId ?>')
             rUsers.forEach(rUser => {
                 rUser.addEventListener('click', function() {
                     const userId = this.getAttribute('data-user');
-                    const userName = this.textContent;
-                    console.log('点击@用户:', userName, 'ID:', userId);
+                    getUserCard(userId);
                     // 这里可以添加跳转到对应用户页面的逻辑
                 });
             });
      }, 500);
+        const commentBox = document.getElementById('comment');
+        const topSentinel = document.getElementById('top-con');
+        const bottomSentinel = document.getElementById('bottom-con');
+        
+        let isAtTop = false;
+        let isAtBottom = false;
+        
+        // 创建观察器
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.target === topSentinel) {
+                    isAtTop = entry.isIntersecting;
+                }
+                if (entry.target === bottomSentinel) {
+                    isAtBottom = entry.isIntersecting;
+                }
+            });
+        }, {
+            root: commentBox,
+            threshold: 0
+        });
+        
+        // 观察顶部和底部标记
+        observer.observe(topSentinel);
+        observer.observe(bottomSentinel);
+        
+        // 监听滚动事件
+        commentBox.addEventListener('scroll', (e) => {
+            // 获取滚动信息
+            const scrollTop = commentBox.scrollTop;
+            const scrollHeight = commentBox.scrollHeight;
+            const clientHeight = commentBox.clientHeight;
+            
+            // 超出底部边界时执行
+            if (scrollTop + clientHeight >= scrollHeight - 1 && !isAtBottom) {
+                console.log('已经到底部，继续往下翻');
+                // 执行你的底部代码
+                onReachBottom();
+            }
+            
+            // 超出顶部边界时执行
+            if (scrollTop <= 0 && !isAtTop) {
+                console.log('已经到顶部，继续往上翻');
+                // 执行你的顶部代码
+                onReachTop();
+            }
+        });
+        
+        // 防止过度触发，添加节流
+        let isThrottled = false;
+        
+        function onReachBottom() {
+            if (isThrottled) return;
+            fetch('/comment/?category=<?= $category ?>&id=<?= $contentId ?>&skip=20')
+    .then(response => response.text())
+    .then(html => {
+        document.getElementById('comments').innerHTML += html;
+    })
+    .catch(error => {
+        document.getElementById('comments').innerHTML += '<div class="error">加载评论失败</div>';
+    });           
+            isThrottled = true;
+            setTimeout(() => {
+                isThrottled = false;
+            }, 500);
+        }
+        
+        function onReachTop() {
+            if (isThrottled) return;
+            fetch('/comment/?category=<?= $category ?>&id=<?= $contentId ?>')
+    .then(response => response.text())
+    .then(html => {
+        document.getElementById('comments').innerHTML = html;
+    })
+    .catch(error => {
+        document.getElementById('comments').innerHTML = '<div class="error">加载评论失败</div>';
+    });           
+            isThrottled = true;
+            setTimeout(() => {
+                isThrottled = false;
+            }, 500);
+        }
+
+// 全局变量跟踪当前卡片
+var currentCard = null;
+// 防止重复调用的标志位
+var isOpeningCard = false;
+// 存储最后一次调用的参数
+var lastUid = null;
+
+// 修改后的 getUserCard 函数，添加防抖处理
+function getUserCard(uid) {
+    // 如果正在打开卡片，直接返回
+    if (isOpeningCard) {
+        console.log('卡片正在打开中，忽略重复调用');
+        return;
+    }
+    
+    // 如果已有卡片，先移除
+    if (currentCard) {
+        currentCard.remove();
+        currentCard = null;
+    }
+    
+    // 设置正在打开标志
+    isOpeningCard = true;
+    lastUid = uid;
+    
+    console.log('显示用户卡片，ID:', uid);
+    
+    fetch('/user/card.php?id=' + uid)
+        .then(r => r.text())
+        .then(html => {
+            // 创建遮罩层
+            const overlay = document.createElement('div');
+            overlay.id = 'userCardOverlay';
+            overlay.style.cssText = `
+                position:fixed;
+                top:0;left:0;right:0;bottom:0;
+                background:rgba(0,0,0,0.5);
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                z-index:9999;
+            `;
+            
+            // 提取卡片内容
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            let cardHTML = temp.innerHTML;
+            
+            // 如果是完整HTML，提取body内容
+            if (html.includes('<body')) {
+                const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                if (bodyMatch) {
+                    const temp2 = document.createElement('div');
+                    temp2.innerHTML = bodyMatch[1];
+                    cardHTML = temp2.innerHTML;
+                }
+            }
+            
+            // 插入卡片
+            overlay.innerHTML = `<div style="position:relative;">${cardHTML}</div>`;
+            
+            // 添加到页面并保存引用
+            document.body.appendChild(overlay);
+            currentCard = overlay;
+            
+            // 重置打开标志
+            isOpeningCard = false;
+            
+            // 事件监听器1：点击遮罩层关闭（使用once确保只绑定一次）
+            overlay.addEventListener('click', function closeOnOverlayClick(e) {
+                if (e.target === overlay) {
+                    // 立即移除事件监听器，防止重复触发
+                    overlay.removeEventListener('click', closeOnOverlayClick);
+                    overlay.remove();
+                    currentCard = null;
+                }
+            }, { once: true });
+            
+            // 事件监听器2：查找并绑定关闭按钮
+            setTimeout(() => {
+                // 查找所有关闭按钮
+                const closeBtns = overlay.querySelectorAll('.close-btn, button[onclick*="close"]');
+                
+                closeBtns.forEach(btn => {
+                    // 移除原有的click事件监听器，防止重复绑定
+                    const newBtn = btn.cloneNode(true);
+                    btn.parentNode.replaceChild(newBtn, btn);
+                    
+                    // 为新按钮绑定事件
+                    newBtn.addEventListener('click', function closeBtnClick(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        
+                        if (overlay.parentNode) {
+                            overlay.remove();
+                            currentCard = null;
+                        }
+                    }, { once: true }); // 使用once确保只触发一次
+                });
+                
+                // 阻止卡片内部点击事件冒泡
+                const cardContent = overlay.querySelector('.user-card') || 
+                                    overlay.querySelector('.centered-container') ||
+                                    overlay.querySelector('div > div');
+                if (cardContent) {
+                    cardContent.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+                
+                // 绑定关注按钮功能（可选）
+                setupUserCardEvents();
+            }, 0);
+        })
+        .catch(e => {
+            console.error('加载失败:', e);
+            isOpeningCard = false; // 出错时也要重置标志
+        });
+}
+
+// 防抖函数，防止快速多次点击
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+// 使用防抖包装的getUserCard函数
+var debouncedGetUserCard = debounce(getUserCard, 300);
+
+// 如果您需要替换原来的调用，可以使用这个防抖版本
+// 示例：debouncedGetUserCard(uid);
+
+// 其他函数保持不变
+function setupUserCardEvents() {
+    const overlay = document.getElementById('userCardOverlay');
+    if (!overlay) return;
+    
+    // 关注按钮功能
+    const followBtn = overlay.querySelector('#followBtn');
+    const unfollowBtn = overlay.querySelector('#unfollowBtn');
+    
+    if (followBtn) {
+        // 克隆并替换按钮，移除旧的事件监听器
+        const newFollowBtn = followBtn.cloneNode(true);
+        followBtn.parentNode.replaceChild(newFollowBtn, followBtn);
+        
+        newFollowBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // 防止事件冒泡
+            console.log('关注用户');
+            
+            // 模拟API请求
+            setTimeout(() => {
+                newFollowBtn.style.display = 'none';
+                if (unfollowBtn) {
+                    const newUnfollowBtn = unfollowBtn.cloneNode(true);
+                    unfollowBtn.parentNode.replaceChild(newUnfollowBtn, unfollowBtn);
+                    newUnfollowBtn.style.display = 'block';
+                }
+                updateFollowersCount(1);
+            }, 300);
+        });
+    }
+    
+    if (unfollowBtn) {
+        // 克隆并替换按钮，移除旧的事件监听器
+        const newUnfollowBtn = unfollowBtn.cloneNode(true);
+        unfollowBtn.parentNode.replaceChild(newUnfollowBtn, unfollowBtn);
+        
+        newUnfollowBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // 防止事件冒泡
+            console.log('取消关注用户');
+            
+            // 模拟API请求
+            setTimeout(() => {
+                newUnfollowBtn.style.display = 'none';
+                if (followBtn) {
+                    const newFollowBtn = followBtn.cloneNode(true);
+                    followBtn.parentNode.replaceChild(newFollowBtn, followBtn);
+                    newFollowBtn.style.display = 'block';
+                }
+                updateFollowersCount(-1);
+            }, 300);
+        });
+    }
+}
+
+function updateFollowersCount(change) {
+    const overlay = document.getElementById('userCardOverlay');
+    if (!overlay) return;
+    
+    const statItems = overlay.querySelectorAll('.stat-item');
+    if (statItems.length > 1) {
+        const followersElement = statItems[1].querySelector('.text');
+        if (followersElement) {
+            const text = followersElement.textContent;
+            const current = parseInt(text.replace(/[^\d]/g, '')) || 0;
+            const newCount = current + change;
+            followersElement.textContent = '粉丝' + newCount.toLocaleString();
+        }
+    }
+}
+
+function handleEscapeKey(e) {
+    if (e.key === 'Escape') {
+        const overlay = document.getElementById('userCardOverlay');
+        if (overlay) {
+            overlay.remove();
+            currentCard = null;
+            isOpeningCard = false; // 重置打开标志
+        }
+    }
+}
+
+// 添加ESC键监听
+document.addEventListener('keydown', handleEscapeKey);
+
+// 如果需要修复页面中的点击事件，可以添加以下代码
+document.addEventListener('DOMContentLoaded', function() {
+    // 查找所有可能触发getUserCard的元素
+    const triggerElements = document.querySelectorAll('[onclick*="getUserCard"], [data-user-id]');
+    
+    triggerElements.forEach(element => {
+        // 移除原有的onclick事件
+        const originalOnClick = element.getAttribute('onclick');
+        if (originalOnClick && originalOnClick.includes('getUserCard')) {
+            element.removeAttribute('onclick');
+            
+            // 获取用户ID
+            const uid = element.dataset.userId || 
+                       originalOnClick.match(/getUserCard\(['"]([^'"]+)['"]\)/)?.[1] ||
+                       originalOnClick.match(/getUserCard\(([^)]+)\)/)?.[1];
+            
+            if (uid) {
+                // 添加新的点击事件，使用防抖版本
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    debouncedGetUserCard(uid.trim());
+                });
+            }
+        }
+    });
+});
     </script>
 </body>
 </html>
