@@ -17,7 +17,7 @@ textarea:focus {
 }
 
 /* 评论框样式修复 */
-.dialog {
+dialog {
     position: fixed;
     top: 5%;
     left: 5%;
