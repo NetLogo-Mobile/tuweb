@@ -93,6 +93,120 @@ $pageTitles = [
 ];
 
 $pageTitle = $pageTitles[$type] ?? '作品详情';
+// 自定义标签解析器类
+class CustomTagParser {
+    
+    /**
+     * 解析包含自定义标签的文本
+     */
+    public static function parse(string $text): string {
+        if (empty($text)) {
+            return '';
+        }
+        
+        // 先转义HTML特殊字符，防止XSS攻击
+        $text = htmlspecialchars($text);
+        
+        // 先解析Markdown标题（在换行转换之前）
+        $text = self::parseMarkdownHeadings($text);
+        
+        // 将换行符转换为<br>
+        $text = nl2br($text);
+        
+        // 解析自定义标签
+        $patterns = [
+            // user标签 - 保持原有格式
+            '/&lt;user=([a-f0-9]+)&gt;(.*?)&lt;\/user&gt;/i',
+            // experiment标签 - 跳转链接
+            '/&lt;experiment=([a-f0-9]+)&gt;(.*?)&lt;\/experiment&gt;/i',
+            // discussion标签 - 跳转链接
+            '/&lt;discussion=([a-f0-9]+)&gt;(.*?)&lt;\/discussion&gt;/i',
+            // model标签 - 跳转链接
+            '/&lt;model=([a-f0-9]+)&gt;(.*?)&lt;\/model&gt;/i',
+            // external标签 - 外部链接
+            '/&lt;external=([^&]+)&gt;(.*?)&lt;\/external&gt;/i',
+            // size标签
+            '/&lt;size=([^&]+)&gt;(.*?)&lt;\/size&gt;/i',
+            // color标签 - 新增
+            '/&lt;color=([^&]+)&gt;(.*?)&lt;\/color&gt;/i',
+            // b标签
+            '/&lt;b&gt;(.*?)&lt;\/b&gt;/i',
+            // i标签
+            '/&lt;i&gt;(.*?)&lt;\/i&gt;/i',
+            // a标签 - 深蓝色标签
+            '/&lt;a&gt;(.*?)&lt;\/a&gt;/i'
+        ];
+        
+        $replacements = [
+            // user标签
+            '<span class="RUser" data-user="$1">$2</span>',
+            // experiment标签
+            '<a href="med.php?id=$1&category=Experiment" class="experiment-link">$2</a>',
+            // discussion标签
+            '<a href="med.php?id=$1&category=Discussion" class="discussion-link">$2</a>',
+            // model标签
+            '<a href="med.php?id=$1&category=Model" class="model-link">$2</a>',
+            // external标签
+            '<a href="$1" target="_blank" rel="noopener noreferrer nofollow" class="external-link">$2</a>',
+            // size标签
+            '<span style="font-size: $1;">$2</span>',
+            // color标签 - 新增
+            '<span style="color: $1;">$2</span>',
+            // b标签
+            '<strong>$1</strong>',
+            // i标签
+            '<em>$1</em>',
+            // a标签
+            '<span class="blue-tag">$1</span>'
+        ];
+        
+        $text = preg_replace($patterns, $replacements, $text);
+        
+        // 解析简单的Markdown格式
+        $text = self::parseSimpleMarkdown($text);
+        
+        return $text;
+    }
+    
+    /**
+     * 解析Markdown标题
+     */
+    private static function parseMarkdownHeadings(string $text): string {
+        // 支持1-6级标题
+        // 一级标题: # 标题
+        $text = preg_replace('/^# (.+)$/m', '<strong class="h1">$1</strong>', $text);
+        
+        // 二级标题: ## 标题
+        $text = preg_replace('/^## (.+)$/m', '<strong class="h2">$1</strong>', $text);
+        
+        // 三级标题: ### 标题
+        $text = preg_replace('/^### (.+)$/m', '<strong clas="h3">$1</strong>', $text);
+        
+        // 四级标题: #### 标题
+        $text = preg_replace('/^#### (.+)$/m', '<strong class="h4">$1</strong>', $text);
+        
+        return $text;
+    }
+    
+    /**
+     * 解析简单的Markdown格式
+     */
+    private static function parseSimpleMarkdown(string $text): string {
+        // 粗体
+        $text = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $text);
+        
+        // 斜体
+        $text = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $text);
+        
+        // 删除线
+        $text = preg_replace('/~~(.*?)~~/', '<del>$1</del>', $text);
+        
+        // 行内代码
+        $text = preg_replace('/`([^`]+)`/', '<code>$1</code>', $text);
+        
+        return $text;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="zh-CN" translate="no" style="--vh: 7.05px;">
@@ -107,6 +221,103 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
     <style>
         *{margin:0;padding:0;box-sizing:border-box}body{font-family:v-sans,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";font-size:14px;line-height:1.6;margin:0;background:#f5f7fa;color:#333}.RUser{color:cornflowerblue}a[internal]{color:cornflowerblue;text-decoration:none}.basic-layout{display:flex;height:100vh}.layout-left{flex:1;position:relative}.layout-right{flex:1;overflow:hidden}.cover{height:100%;background-size:cover;background-position:center;position:relative;display:flex;flex-direction:column;padding:20px}.return{width:2.7em;cursor:pointer}.title{font-size:24px;font-weight:bold;color:white;margin:10px 0;text-align:left}.tag{display:inline-block;padding:4px 12px;margin:2px;border-radius:16px;background:rgba(255,255,255,0.2);color:white;font-size:12px}.coverBottom{margin-top:auto}.btns{display:flex;justify-content:space-around}.enter{padding:8px 24px;border-radius:25px;background:#2080f0;color:white;border:none;cursor:pointer;font-size:14px}.scroll-container{height:100%;overflow-y:auto}.context{padding:20px}.n-tabs{width:100%}.n-tabs-wrapper{display:flex;justify-content:space-evenly}.n-tabs-tab{padding:10px 0;cursor:pointer;color:#666}.n-tabs-tab--active{color:#18a058;font-weight:500}.n-tab-pane{margin-top:20px}.gray{background:#f8f9fa;border-radius:12px;padding:15px}.intro{text-align:left;line-height:1.8}.intro p{margin-bottom:15px}.intro h1,.intro h2,.intro h3{color:#2080f0;margin:20px 0 10px}.intro ul,.intro ol{margin:10px 0;padding-left:20px}.intro li{margin:5px 0}.user-info{display:flex;align-items:center;padding:15px;background:white;border-radius:10px;margin:5px 0}.user-avatar{width:50px;height:50px;border-radius:50%;margin-right:15px}.user-details{text-align:left}.user-name{color:#007bff;margin:0;font-size:16px}.user-bio{color:gray;margin:5px 0 0}.action-buttons{display:flex;gap:10px;margin:20px 0}.btn{padding:10px 20px;border-radius:20px;border:none;cursor:pointer;font-size:14px}.btn-primary{background:#2080f0;color:white}.btn-secondary{background:#f8f9fa;color:#333;border:1px solid #ddd}.error{text-align:center;padding:60px 20px;color:#e74c3c}.empty{text-align:center;padding:60px 20px;color:#666}.back-button{position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.2);color:white;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;z-index:10}.footer{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:10px 0;box-shadow:0 -2px 10px rgba(0,0,0,0.1);z-index:1000}.footer div{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;color:#666}.footer div.active{color:#667eea}.footer i{font-size:20px}.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:15px 0}.stat-item{text-align:center;padding:10px;background:white;border-radius:8px}.stat-number{font-size:18px;font-weight:bold;color:#2080f0}.stat-label{font-size:12px;color:#666}.markdown-content h1{font-size:24px;margin:20px 0 10px}.markdown-content h2{font-size:20px;margin:15px 0 8px}.markdown-content h3{font-size:16px;margin:12px 0 6px}.markdown-content ul,.markdown-content ol{padding-left:20px}.markdown-content li{margin:5px 0}@media (max-width:768px){.basic-layout{flex-direction:column}.layout-left,.layout-right{flex:none}.layout-left{height:50vh}.layout-right{height:50vh}.stats-grid{grid-template-columns:repeat(2,1fr)}}
     </style>
+<style>
+/* 标题样式 */
+.intro .h1,
+.intro .h2,
+.intro .h3,
+.intro .h4 {
+    font-weight: bold;
+    margin: 12px 0 6px 0;
+    line-height: 1.2;
+}
+
+.intro .h1 {
+    font-size: 20px;
+}
+
+.intro .h2 {
+    font-size: 19px;
+}
+
+.intro .h3 {
+    font-size: 18px;
+}
+
+.intro .h4 {
+    font-size: 17px;
+}
+
+/* <a>标签样式 - 深蓝色标签，无边框，大小与普通字体一样 */
+.blue-tag {
+    color: #0000FF;
+    font-size: 1em;
+    text-decoration: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: none;
+    font-weight: normal;
+}
+
+/* 会跳转的标签样式 - 包括experiment, discussion, model, external */
+.experiment-link,
+.discussion-link,
+.model-link,
+.external-link {
+    color: skyblue;
+    font-size: 1em;
+    text-decoration: none;
+    border: none;
+    padding: 0;
+    margin: 0 2px;
+    background: none;
+    font-weight: normal;
+}
+
+.experiment-link:hover,
+.discussion-link:hover,
+.model-link:hover,
+.external-link:hover {
+    text-decoration: underline;
+}
+
+/* color标签样式 - 继承父元素字体大小 */
+.notification_text [style*="color:"] {
+    font-size: inherit;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: none;
+}
+
+/* Markdown代码样式 */
+.notification_text code {
+    background-color: #f5f5f5;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #c7254e;
+}
+
+.notification_text del {
+    color: #999;
+    text-decoration: line-through;
+}
+
+.notification_text strong {
+    font-weight: 600;
+}
+
+.notification_text em {
+    font-style: italic;
+}
+.RUser {
+    color: #1890ff;
+    font-weight: 500;
+}
+</style>
 </head>
 <body>
     <div id="app">
@@ -189,9 +400,9 @@ $pageTitle = $pageTitles[$type] ?? '作品详情';
                                             <h3 style="color: #2080f0; text-align: left; margin-top: 2px; margin-bottom: 10px;">作品介绍</h3>
                                             <div class="markdown-content intro">
                                                 <?php if ($content && isset($content['LocalizedDescription']['Chinese'])): ?>
-                                                    <?= nl2br(htmlspecialchars($content['LocalizedDescription']['Chinese'])) ?>
+                                                    <?= CustomTagParser::parse($content['LocalizedDescription']['Chinese']) ?>
                                                 <?php else: ?>
-                                                    <?= implode('<br>', $content['Description']) ?>
+                                                    <?= implode('<br>', array_map(function($a) {return CustomTagParser::parse($a);}, $content['Description'])) ?>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -632,6 +843,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+const rUsers = document.querySelectorAll('.RUser');
+    rUsers.forEach(rUser => {
+        rUser.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const userId = this.getAttribute('data-user');
+            if (userId) {
+                window.location.href = 'user.php?id=' + userId;
+            }
+        });
+    });
     </script>
 </body>
 </html>
