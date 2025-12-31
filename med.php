@@ -449,7 +449,7 @@ class CustomTagParser {
 
         // 实验操作函数
         function runExperiment() {
-            alert('进入实验功能即将开放');
+            location.href='experiments/?id=<?= $contentId ?>';
         }
 
         function favoriteExperiment() {
