@@ -107,8 +107,8 @@ $vers = [
     background: white;
     border-radius: 15px;
     padding: 25px;
-    width: 90%;
-    max-width: 400px;
+    width: 120%;
+    max-width: 600px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     box-sizing: border-box;
