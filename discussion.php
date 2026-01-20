@@ -154,7 +154,7 @@ $modules = [
         <div><i class="fas fa-user"></i><span>我的</span></div>
         <div class="active"><i class="fas fa-water"></i><span>海水</span></div>
         <div><i class="fas fa-cube" onclick="location.href='model.php'"></i><span>模型库</span></div>
-        <div><i class="fas fa-bell"></i><span>通知</span></div>
+        <div onclick="location.href='nof.php'"><i class="fas fa-bell"></i><span>通知</span></div>
     </div>
 
     <script>
