@@ -52,6 +52,7 @@ $modules = [
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>Turtle Universe Web</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="manifest" href="/manifest.json">
@@ -137,7 +138,7 @@ $modules = [
 
     <div class="footer">
         <div class="active"><i class="fas fa-home"></i><span>首页</span></div>
-        <div><i class="fas fa-user"></i><span>我的</span></div>
+        <div onclick="location.href='me.php'"><i class="fas fa-user"></i><span>我的</span></div>
         <div onclick="location.href='discussion.php'"><i class="fas fa-water"></i><span>海水</span></div>
         <div onclick="location.href='model.php'"><i class="fas fa-cube"></i><span>模型库</span></div>
         <div onclick="location.href='nof.php'"><i class="fas fa-bell"></i><span>通知</span></div>
