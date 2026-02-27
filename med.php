@@ -472,14 +472,17 @@ class CustomTagParser {
             alert('改编功能即将开放');
         }
 // 使用JavaScript动态加载评论
-fetch('/comment/?category=<?= $category ?>&id=<?= $contentId ?>')
+setInterval(()=>{
+  fetch('/comment/?category=<?= $category ?>&id=<?= $contentId ?>')
     .then(response => response.text())
     .then(html => {
         document.getElementById('comments').innerHTML = html;
     })
     .catch(error => {
         document.getElementById('comments').innerHTML = '<div class="error">加载评论失败</div>';
-    });
+  });
+}, 10000);
+//每10s更新一次
   </script>
     <script>
     setInterval(()=>{
