@@ -191,7 +191,7 @@ try {
             <button type="submit" class="btn primary">立即注册</button>
             
             <div class="auth-footer">
-                <span>没有账户？</span>
+                <span>已有账户？</span>
                 <a href="login.php" class="link">立即登录</a>
             </div>
         </form>
