@@ -141,7 +141,7 @@ try {
     
 }
 ?>
-</pre>
+<link rel="stylesheet" href="/styles/auth.css"/>
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
