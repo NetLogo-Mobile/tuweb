@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: my-repo
+          fetch-depth: 0
 
       - name: Checkout friend's fork
         uses: actions/checkout@v4
@@ -20,6 +21,7 @@ jobs:
           repository: electrolysis743/tuweb
           ref: main
           path: friend-repo
+          fetch-depth: 0
 
       - name: Prepare branch name and check existence
         id: prep
@@ -44,12 +46,10 @@ jobs:
           git checkout -b "${{ steps.prep.outputs.branch }}"
           git remote add friend ../friend-repo || true
           git fetch friend main
-
           if ! git merge friend/main --no-edit --allow-unrelated-histories; then
-            echo "❌ conflicts.have"
+            echo "❌ 合并冲突，请手动处理"
             exit 1
           fi
-
           git push origin "${{ steps.prep.outputs.branch }}"
 
       - name: Create Pull Request
