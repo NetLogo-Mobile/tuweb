@@ -1,0 +1,221 @@
+<html>
+ 
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/codemirror/lib/db781048fb310ce33990e10fd3b6e57e-codemirror.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/codemirror/addon/dialog/c89dce10b44d2882a024e7befc2b63f5-dialog.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/codemirror/addon/hint/49647712414ff96d5846de9736b5dbd3-show-hint.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/chosen-js/d7ca5ca9441ef9e10f9ea5d90002690a-chosen.min.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/930fb599ce1eee7c73a7ce457e77df83-netlogo-fonts.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/3ff28a22d9033728d7a66c0df894d8d5-classes.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/b9a92502d3ac3af0e974e5f0e2cc965c-widgets.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/f6706ff1eb77acc7dce846bc15fbdecb-info.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/86954f3afe3de47251c2d66058aea884-ui-editor.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/834ae822d87d8aeb4046279c08d64cf8-netlogoweb.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/7944911f182cddcdf77a1f498d2a9d7f-netlogo-syntax.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/ff49251ed54710336fd03373eab57dc1-spinner.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/218780b8731fe97abc1058e0c9fef979-alert.css">
+    </link>
+    <link rel="stylesheet" href="https://netlogoweb.org/assets/stylesheets/6e21a662c85e56fddbb022c21e0acde3-js-error.css">
+    </link>
+ 
+ 
+    <!-- Google tag (gtag.js) -->
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has("disableAnalytics")) {
+            // in theory injecting the script this way shouldn't be necessary with Google's consent flags, but I was still
+            // seeing results pop up in the analytics reports that didn't look quite right.  So this seems safer.  -Jeremy B
+            // Octver 2025
+            const gScript = document.createElement('script');
+            gScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-K67S9EZ4QL';
+            gScript.async = true;
+            document.head.appendChild(gScript);
+ 
+            window.dataLayer = window.dataLayer || [];
+ 
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', 'G-K67S9EZ4QL', {
+                'custom_map': {
+                    'dimension1': 'app_type'
+                }
+            });
+ 
+        }
+    </script>
+ 
+ 
+</head>
+ 
+<body style="margin: 0px;">
+    <div class="dark-overlay" id="loading-overlay">
+        <div id="spinner" class="spinner" style="display: none;">
+ 
+            <svg class="spinner-img turtle1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 55">
+                <polygon points="22,0 0,49 22,40 44,49" style="fill: rgba(255, 255, 255, 0.125);" transform="rotate(45.0, 22, 24)">
+                </polygon>
+            </svg>
+ 
+            <svg class="spinner-img turtle2" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 55">
+                <polygon points="22,0 0,49 22,40 44,49" style="fill: rgba(255, 255, 255, 0.25);" transform="rotate(90.0, 22, 24)">
+                </polygon>
+            </svg>
+ 
+            <svg class="spinner-img turtle3" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 55">
+                <polygon points="22,0 0,49 22,40 44,49" style="fill: rgba(255, 255, 255, 0.375);" transform="rotate(135.0, 22, 24)">
+                </polygon>
+            </svg>
+ 
+            <svg class="spinner-img turtle4" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 55">
+                <polygon points="22,0 0,49 22,40 44,49" style="fill: rgba(255, 255, 255, 0.5);" transform="rotate(180.0, 22, 24)">
+                </polygon>
+            </svg>
+ 
+            <svg class="spinner-img turtle5" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 55">
+                <polygon points="22,0 0,49 22,40 44,49" style="fill: rgba(255, 255, 255, 0.625);" transform="rotate(225.0, 22, 24)">
+                </polygon>
+            </svg>
+ 
+            <svg class="spinner-img turtle6" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 55">
+                <polygon points="22,0 0,49 22,40 44,49" style="fill: rgba(255, 255, 255, 0.75);" transform="rotate(270.0, 22, 24)">
+                </polygon>
+            </svg>
+ 
+            <svg class="spinner-img turtle7" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 55">
+                <polygon points="22,0 0,49 22,40 44,49" style="fill: rgba(255, 255, 255, 0.875);" transform="rotate(315.0, 22, 24)">
+                </polygon>
+            </svg>
+ 
+            <svg class="spinner-img turtle8" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 55">
+                <polygon points="22,0 0,49 22,40 44,49" style="fill: rgba(255, 255, 255, 1.0);" transform="rotate(360.0, 22, 24)">
+                </polygon>
+            </svg>
+ 
+        </div>
+ 
+        <div id="js-warning">
+            NetLogo Web requires JavaScript in order to run a model, but it does not appear to be working. Please check your browser settings to ensure this site can use JavaScript, or contact your administrator if you are using a managed computer.
+        </div>
+        <script type="text/javascript">
+            const jsWarnDiv = document.getElementById("js-warning");
+            jsWarnDiv.style = "display: none;";
+ 
+            const enableDiv = document.getElementById("spinner");
+            enableDiv.style = "";
+        </script>
+ 
+    </div>
+ 
+    <div id="alert-container"></div>
+    <div id="netlogo-model-container" class="netlogo-model-container"></div>
+    <script src="https://netlogoweb.org/assets/jquery/dist/00727d1d5d9c90f7de826f1a4a9cc632-jquery.min.js"></script>
+    <script src="https://netlogoweb.org/assets/chosen-js/3e9f1dcb9cc75169765265133fb815a7-chosen.jquery.min.js"></script>
+    <script src="https://netlogoweb.org/assets/file-saver/dist/349c8aca9d3d0518362d1982d08f1a0f-FileSaver.min.js"></script>
+    <script src="https://netlogoweb.org/assets/lib/google-caja/68b7cef56f40f17b6992d32aa2047066-html-sanitizer-minified.js"></script>
+    <script src="https://netlogoweb.org/assets/lib/markdown-js/f1543dd6ae2ffd2e0ae39f0f975c0e4d-markdown.js"></script>
+    <script src="https://netlogoweb.org/assets/mousetrap/ca067c14a1159f519241b602e95bf45c-mousetrap.min.js"></script>
+    <script src="https://netlogoweb.org/assets/localforage/dist/971e2b863ccdb5d43003cdc5f4e0d923-localforage.min.js"></script>
+    <script src="https://netlogoweb.org/assets/highcharts/70854d5c319b8e8839f65cd9119937d4-highcharts.js"></script>
+    <!--
+      I'd like to enable this, but as of version 10.3.1 when it's enabled it causes the export context menu to not
+      function.  I'll look into it further, but for now we leave it off.  -Jeremy B March 2023
+      ___subtmpl10<script  src="https://netlogoweb.org/assets/highcharts/modules/8e95ae3ab294d33b3dc6916095455368-accessibility.js"></script>
+    -->
+    <script src="https://netlogoweb.org/assets/highcharts/modules/02d3012e0a5d2c755ea319ef113e51bf-boost.js"></script>
+    <script src="https://netlogoweb.org/assets/highcharts/modules/6bd97c420fb18072f00940b7b1fae281-exporting.js"></script>
+    <script src="https://netlogoweb.org/assets/highcharts/modules/023f524fff9e1f0040e684cbfad688d3-export-data.js"></script>
+    <script src="https://netlogoweb.org/assets/ractive/a5a0d36d759f07c111d33eb49cf7f300-ractive.min.js"></script>
+    <script src="https://netlogoweb.org/assets/codemirror/lib/f8b51ee33b9ee72250c8c034462972f3-codemirror.js"></script>
+    <script src="https://netlogoweb.org/assets/codemirror/addon/comment/4db2ea23b206be3a25db7cc4503f7688-comment.js"></script>
+    <script src="https://netlogoweb.org/assets/codemirror/addon/dialog/678f0365b883edd0669a1f8cd30de72d-dialog.js"></script>
+    <script src="https://netlogoweb.org/assets/codemirror/addon/mode/290d55f765743d635798cd98c2141163-simple.js"></script>
+    <script src="https://netlogoweb.org/assets/codemirror/addon/search/b23aa921bb6f30235bf58d81b53087af-searchcursor.js"></script>
+    <script src="https://netlogoweb.org/assets/codemirror/addon/search/e5d089904a88e28a5c5a2adc74588994-search.js"></script>
+    <script src="https://netlogoweb.org/assets/codemirror/addon/hint/f358a42a557e3832d282a693154e2ebb-show-hint.js"></script>
+ 
+    <script src="https://netlogoweb.org/tortoise-compiler.js"></script>
+    <script src="https://netlogoweb.org/netlogo-engine.js"></script>
+
+    <script type="text/javascript">
+        var jsRoutes = {};
+        (function(_root) {
+            var _nS = function(c, f, b) {
+                var e = c.split(f || "."),
+                    g = b || _root,
+                    d, a;
+                for (d = 0, a = e.length; d < a; d++) {
+                    g = g[e[d]] = g[e[d]] || {}
+                }
+                return g
+            }
+            var _qS = function(items) {
+                var qs = '';
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i]) qs += (qs ? '&' : '') + items[i]
+                };
+                return qs ? ('?' + qs) : ''
+            }
+            var _s = function(p, s) {
+                return p + ((s === true || (s && s.secure)) ? 's' : '') + ':\/\/'
+            }
+            var _wA = function(r) {
+                return {
+                    ajax: function(c) {
+                        c = c || {};
+                        c.url = r.url;
+                        c.type = r.method;
+                        return jQuery.ajax(c)
+                    },
+                    method: r.method,
+                    type: r.method,
+                    url: r.url,
+                    absoluteURL: function(s) {
+                        return _s('http', s) + 'netlogoweb.org' + r.url
+                    },
+                    webSocketURL: function(s) {
+                        return _s('ws', s) + 'netlogoweb.org' + r.url
+                    }
+                }
+            }
+            _nS('controllers.Local');
+            _root['controllers']['Local']['standalone'] =
+                function() {
+                    return _wA({
+                        method: "GET",
+                        url: "\/" + "standalone"
+                    })
+                };
+        })(jsRoutes)
+    </script>
+    <!-- This can be used to insert NetLogo code into this page -->
+    <script type="text/nlogo" id="nlogo-code" data-filename="https://netlogoweb.org/model.nlogox"></script>
+    <script>
+        window.debugMode = false;
+        Ractive.DEBUG = window.debugMode;
+        const l = window.location;
+        const dirPath = l.pathname.split("\/").slice(0, -1).join("\/");
+        window.standaloneURL = `${l.protocol}//${l.host}${dirPath}/standalone`;
+    </script>
+ 
+ 
+    <script type="module" src="https://netlogoweb.org/assets/javascripts/pages/5e9df32c62f2d0fa1a113a9469a449b6-simulation.js"></script>
+ 
+ 
+</body>
+ 
+</html>

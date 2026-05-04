@@ -1,0 +1,173 @@
+/* 认证页面通用样式 */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 450px;
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.site-logo {
+    width: 80px;
+    margin-bottom: 1.5rem;
+}
+
+.auth-header h1 {
+    font-size: 1.8rem;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+    color: #718096;
+}
+
+/* 表单增强样式 */
+.auth-form .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.auth-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 0.875rem 2.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.auth-form input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    bottom: 0.9rem;
+    font-size: 1.2rem;
+    color: #a0aec0;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.btn.primary {
+    background: #1877f2;
+    color: white;
+}
+
+.btn.primary {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn.primary:hover {
+    transform: translateY(-2px);
+}
+
+/* 底部链接 */
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #718096;
+}
+
+.link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 1rem;
+    }
+    
+    .auth-card {
+        padding: 1.5rem;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+/* 加载动画 */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+    margin-right: 0.5rem;
+}
