@@ -1,0 +1,9 @@
+{
+  "name": "netlogo-mobile/tuweb",
+  "description": "Turtle Universe Web",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": ">=7.4"
+  }
+}
