@@ -1,0 +1,66 @@
+name: "Create Pull Request from Fork"
+
+on:
+  repository_dispatch:
+    types: [sync-from-fork]
+  workflow_dispatch:
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+        with:
+          path: my-repo
+
+      - name: Checkout friend's fork
+        uses: actions/checkout@v4
+        with:
+          repository: electrolysis743/tuweb
+          ref: main
+          path: friend-repo
+
+      - name: Prepare branch name and check existence
+        id: prep
+        run: |
+          cd my-repo
+          BRANCH_NAME="auto-sync-$(date +%Y%m%d-%H%M%S)"
+          echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          git fetch origin
+          if git rev-parse --quiet --verify "origin/$BRANCH_NAME" >/dev/null; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create sync branch and merge friend's changes
+        if: steps.prep.outputs.skip == 'false'
+        run: |
+          cd my-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git checkout -b "${{ steps.prep.outputs.branch }}"
+          
+          git remote add friend ../friend-repo
+          git fetch friend main
+          
+          git merge friend/main --no-edit --allow-unrelated-histories || echo "有冲突，请手动处理"
+          
+          git push origin "${{ steps.prep.outputs.branch }}"
+
+      - name: Create Pull Request
+        if: steps.prep.outputs.skip == 'false'
+        run: |
+          cd my-repo
+          gh pr create \
+            --title "Renew" \
+            --body "Auto Created." \
+            --base main \
+            --head "${{ steps.prep.outputs.branch }}" \
+            --assignee "tiao2" \
+            --reviewer "tiao2" \
+            || echo "PR may exist"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
