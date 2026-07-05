@@ -5,7 +5,7 @@
  */
 
 session_start();
-
+include 'getv.php';
 // ==================== 配置区域 ====================
 define('EXPERIMENTS_DIR', __DIR__ . '/experiments/');
 define('MODEL_LIFETIME', 60);

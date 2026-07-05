@@ -2,17 +2,16 @@
 session_start();
 
 // ---------- 参数获取与登录检查 ----------
-$category  = $_GET['category'] ?? 'Model';
+$category  = ucfirst($_GET['category']) ?? 'Model';
 $contentId = $_GET['id'] ?? '';
 $type      = $_GET['type'] ?? '';
 
-if (!isset($_SESSION['token']) || !isset($_SESSION['authCode'])) {
-    $redirectUrl = '/getv.php?r=' . urlencode("med.php?category={$category}&id={$contentId}&type={$type}");
-    header('Location: ' . $redirectUrl);
-    exit;
-}
+include 'getv.php';
 $token    = $_SESSION['token'];
 $authCode = $_SESSION['authCode'];
+$currentUser = isset($dt['Data']['User']) ? $dt['Data']['User'] : null;
+$isLoggedIn = ($currentUser !== null && !empty($currentUser['ID']));
+$userId = $isLoggedIn ? $currentUser['ID'] : '';
 
 // ---------- 默认头像/封面 SVG ----------
 define('DEFAULT_AVATAR', 'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="#e0e0e0"/><circle cx="50" cy="40" r="20" fill="#bdbdbd"/><path d="M30 75 Q50 60 70 75 Z" fill="#bdbdbd"/></svg>'));
@@ -20,7 +19,7 @@ define('DEFAULT_COVER', 'data:image/svg+xml;base64,' . base64_encode('<svg xmlns
 
 // ---------- API 请求函数 ----------
 function getContentSummary($contentId, $category, $token, $authCode) {
-    $url = 'http://nlm-api-cn.turtlesim.com/Contents/GetSummary';
+    $url = 'https://nlm-api-cn.turtlesim.com/Contents/GetSummary';
     $body = json_encode(['ContentID' => $contentId, 'Category' => $category]);
     $headers = [
         'Content-Type: application/json', 'Accept: application/json', 'Accept-Language: zh-CN',
@@ -41,7 +40,7 @@ function getContentSummary($contentId, $category, $token, $authCode) {
 }
 
 function getDerivativesAndSupporters($contentId, $category, $token, $authCode) {
-    $url = 'http://nlm-api-cn.turtlesim.com/Contents/GetDerivatives';
+    $url = 'https://nlm-api-cn.turtlesim.com/Contents/GetDerivatives';
     $body = json_encode(['ContentID' => $contentId, 'Category' => $category]);
     $headers = [
         'Content-Type: application/json', 'Accept: application/json', 'Accept-Language: zh-CN',
@@ -68,7 +67,7 @@ function getDerivativesAndSupporters($contentId, $category, $token, $authCode) {
 }
 
 function isContentStarred($contentId, $category, $token, $authCode) {
-    $url = 'http://nlm-api-cn.turtlesim.com/Contents/IsStarred';
+    $url = 'https://nlm-api-cn.turtlesim.com/Contents/IsStarred';
     $body = json_encode(['ContentID' => $contentId, 'Category' => $category]);
     $headers = [
         'Content-Type: application/json',
@@ -91,6 +90,23 @@ function isContentStarred($contentId, $category, $token, $authCode) {
 $contentData = getContentSummary($contentId, $category, $token, $authCode);
 $content = $contentData['Data'] ?? null;
 
+// 修复作者/合作者判断（统一转为字符串比较）
+$isAuthor = false;
+if ($isLoggedIn && $content && isset($content['User']['ID'])) {
+    $userIdStr = (string)$userId;
+    $authorIdStr = (string)$content['User']['ID'];
+    $isCoauthor = false;
+    if (!empty($content['Coauthors']) && is_array($content['Coauthors'])) {
+        foreach ($content['Coauthors'] as $coauthor) {
+            if (isset($coauthor['ID']) && (string)$coauthor['ID'] === $userIdStr) {
+                $isCoauthor = true;
+                break;
+            }
+        }
+    }
+    $isAuthor = ($authorIdStr === $userIdStr) || $isCoauthor;
+}
+
 // 改编 + 支持者
 $derivativesData = getDerivativesAndSupporters($contentId, $category, $token, $authCode);
 $remixes     = $derivativesData['Experiments']['Children-Models'] ?? [];
@@ -102,13 +118,13 @@ $isStarred = isContentStarred($contentId, $category, $token, $authCode);
 // ---------- 辅助函数 ----------
 function buildAvatarUrl($userId, $avatarId) {
     if (!$avatarId || !$userId) return DEFAULT_AVATAR;
-    $base = 'http://netlogo-cn.oss-cn-hongkong.aliyuncs.com/users/avatars/';
+    $base = 'https://netlogo-cn.oss-cn-hongkong.aliyuncs.com/users/avatars/';
     return $base . substr($userId,0,4) . '/' . substr($userId,4,2) . '/' . substr($userId,6,2) . '/' . substr($userId,8,16) . '/' . $avatarId . '.jpg!full';
 }
 
 function buildThumbUrl($exp) {
     if (($exp['Image'] ?? 0) < 0) return DEFAULT_COVER;
-    $base = 'http://netlogo-cn.oss-cn-hongkong.aliyuncs.com/experiments/images/';
+    $base = 'https://netlogo-cn.oss-cn-hongkong.aliyuncs.com/experiments/images/';
     $id = $exp['ID'];
     return $base . substr($id,0,4) . '/' . substr($id,4,2) . '/' . substr($id,6,2) . '/' . substr($id,8,16) . '/' . $exp['Image'] . '.jpg!full';
 }
@@ -273,23 +289,23 @@ class CustomTagParser {
                                 <div id="intro-tab" class="qh">
                                     <div class="user-info" onclick="event.stopPropagation(); getUserCard('<?= $content['User']['ID'] ?>')">
                                         <img class="user-avatar" src="<?= buildAvatarUrl($content['User']['ID'], $content['User']['Avatar'] ?? 0) ?>" alt="">
-                                        <div class="user-details">
+                                        <div class="user-details author">
                                             <p class="user-name"><?= htmlspecialchars($content['User']['Nickname'] ?? '未知') ?></p>
                                             <p class="user-bio"><?= htmlspecialchars($content['User']['Signature'] ?? '') ?></p>
                                         </div>
                                     </div>
                                     <!-- 改编自信息 -->
                                     <?php if ($parentModel && $parentModel['ID']): ?>
-                                    <div class="user-info" style="cursor:pointer" onclick="location.href='med.php?id=<?= $parentModel['ID'] ?>&category=Model'">
+                                    <div class="user-info adapted-from" style="cursor:pointer" onclick="location.href='med.php?id=<?= $parentModel['ID'] ?>&category=Model'">
                                         <img class="user-avatar" src="<?= buildThumbUrl($parentModel) ?>" alt="">
                                         <div class="user-details">
                                             <p class="user-name" style="font-size:14px">改编自「<?= htmlspecialchars($parentModel['LocalizedSubject']['Chinese'] ?? $parentModel['Subject'] ?? '未知') ?>」</p>
-                                            <p class="user-bio">作者 <?= htmlspecialchars($parentModel['User']['Nickname'] ?? '') ?></p>
+                                            <p class="user-bio not-author">作者 <?= htmlspecialchars($parentModel['User']['Nickname'] ?? '') ?></p>
                                         </div>
                                     </div>
                                     <?php endif; ?>
                                     <div style="background:white;border-radius:10px;padding:15px;margin-top:5px">
-                                        <h3 style="color:#2080f0;text-align:left;margin-bottom:10px">作品介绍</h3>
+                                        <h3 style="color:#2080f0;text-align:left;margin-bottom:10px" <?= $isAuthor ? ('onclick="location.href=\'edit.php?category=' . $category . '&id=' . $contentId . '\'"') : '' ?>>作品介绍</h3>
                                         <div class="markdown-content intro">
                                             <?php if ($content && isset($content['LocalizedDescription']['Chinese'])): ?>
                                                 <?= CustomTagParser::parse($content['LocalizedDescription']['Chinese']) ?>
@@ -388,7 +404,7 @@ function loadRemixes() {
     container.innerHTML = remixes.map(r => {
         const title = r.LocalizedSubject?.Chinese || r.Subject || '未命名';
         const uid = r.User?.ID || '';
-        const avatar = uid && r.User?.Avatar ? `http://netlogo-cn.oss-cn-hongkong.aliyuncs.com/users/avatars/${uid.substring(0,4)}/${uid.substring(4,6)}/${uid.substring(6,8)}/${uid.substring(8,24)}/${r.User.Avatar}.jpg!full` : '<?= DEFAULT_AVATAR ?>';
+        const avatar = uid && r.User?.Avatar ? `https://netlogo-cn.oss-cn-hongkong.aliyuncs.com/users/avatars/${uid.substring(0,4)}/${uid.substring(4,6)}/${uid.substring(6,8)}/${uid.substring(8,24)}/${r.User.Avatar}.jpg!full` : '<?= DEFAULT_AVATAR ?>';
         return `<div class="user-info" style="cursor:pointer" onclick="location.href='med.php?id=${r.ID}&category=Model'">
                     <img class="user-avatar" src="${avatar}" onerror="this.onerror=null;this.src='<?= DEFAULT_AVATAR ?>';">
                     <div class="user-details">

@@ -6,12 +6,7 @@ $category = isset($_GET['category']) ? ucfirst($_GET['category']) : 'Model';
 $contentId = $_GET['id'] ?? '';
 $skp = isset($_GET['skip']) ? (int)$_GET['skip'] : 0;
 
-// 如果未登录，重定向去获取 token
-if (!isset($_SESSION['responseBody'])) {
-    $redirectUrl = '/getv.php?r=' . urlencode("comment/?category={$category}&id={$contentId}&skip={$skp}");
-    header('Location: ' . $redirectUrl);
-    exit;
-}
+include 'getv.php';
 
 // ---------- MessageService 类（完整版）----------
 class MessageService {

@@ -7,12 +7,7 @@ header("Referrer-Policy: no-referrer");
 $targetId   = $_GET['id'] ?? '';
 $targetName = $_GET['name'] ?? '';
 
-// 登录检查
-if (!isset($_SESSION['token']) || !isset($_SESSION['authCode'])) {
-    $redirectUrl = '/getv.php?r=' . urlencode($_SERVER['REQUEST_URI']);
-    header('Location: ' . $redirectUrl);
-    exit;
-}
+include 'getv.php';
 $token    = $_SESSION['token'];
 $authCode = $_SESSION['authCode'];
 

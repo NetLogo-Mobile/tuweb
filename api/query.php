@@ -17,6 +17,7 @@ $sort      = (int)($_GET['sort']  ?? 0);
 $skip      = (int)($_GET['skip']  ?? 0);
 $take      = min((int)($_GET['take'] ?? 20), 100);
 $from      = trim($_GET['from']   ?? '');
+$days      = (int)($_GET['days']  ?? 0);
 
 // 标签处理
 $tags = [];
@@ -44,7 +45,7 @@ $query = [
     'From'              => $from !== '' ? $from : null,
     'Skip'              => $skip,
     'Take'              => -$take,
-    'Days'              => 0,
+    'Days'              => $days,
     'Sort'              => $sort,
     'ShowAnnouncement'  => false,
 ];
